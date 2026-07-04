@@ -100,11 +100,16 @@ export class OverpassService {
       const coords = el.geometry.map(
         (g) => [g.lat, g.lon] as [number, number]
       );
+      const realName = el.tags?.['name'];
+      const ref = el.tags?.['ref'];
+      const highway = el.tags?.['highway'] ?? 'road';
       const seg: RoadSegment = {
         id: el.id,
-        name: el.tags?.['name'] ?? el.tags?.['ref'] ?? 'Unnamed road',
-        highway: el.tags?.['highway'] ?? 'road',
+        name: realName ?? ref ?? `Unnamed ${humanizeHighway(highway)}`,
+        highway,
         oneway: el.tags?.['oneway'] === 'yes',
+        hasName: !!realName,
+        identified: !!(realName || ref),
         nodeIds: el.nodes,
         coords
       };
@@ -164,6 +169,8 @@ export class OverpassService {
           key,
           name: seg.name,
           highway: seg.highway,
+          hasName: seg.hasName,
+          identified: seg.identified,
           segmentIds: [],
           lengthKm: 0
         };
@@ -175,8 +182,8 @@ export class OverpassService {
     return Array.from(byName.values())
       .map((s) => ({ ...s, lengthKm: Math.round(s.lengthKm * 100) / 100 }))
       .sort((a, b) => {
-        if (a.name === 'Unnamed road') return 1;
-        if (b.name === 'Unnamed road') return -1;
+        // Identified (named/numbered) roads first, then longest.
+        if (a.identified !== b.identified) return a.identified ? -1 : 1;
         return b.lengthKm - a.lengthKm;
       });
   }
@@ -199,6 +206,28 @@ export class OverpassService {
     const dLng = radiusKm / (111 * Math.cos((lat * Math.PI) / 180) || 1);
     return [lat - dLat, lng - dLng, lat + dLat, lng + dLng];
   }
+}
+
+/** Readable description of an OSM highway class, for unnamed roads. */
+function humanizeHighway(hw: string): string {
+  const map: Record<string, string> = {
+    motorway: 'motorway',
+    motorway_link: 'motorway ramp',
+    trunk: 'trunk road',
+    trunk_link: 'trunk ramp',
+    primary: 'primary road',
+    primary_link: 'primary link',
+    secondary: 'secondary road',
+    secondary_link: 'secondary link',
+    tertiary: 'tertiary road',
+    tertiary_link: 'tertiary link',
+    residential: 'residential street',
+    living_street: 'living street',
+    unclassified: 'local road',
+    pedestrian: 'pedestrian way',
+    road: 'road'
+  };
+  return map[hw] ?? 'road';
 }
 
 function haversineKm(a: [number, number], b: [number, number]): number {

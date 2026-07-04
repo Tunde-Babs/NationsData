@@ -33,10 +33,30 @@
     <!-- stats -->
     @if (stats(); as s) {
       <div class="mini-stats">
-        <div><b>{{ full(s.streets) }}</b><span>named streets</span></div>
+        <div><b>{{ full(s.streets) }}</b><span>labelled roads</span></div>
         <div><b>{{ full(s.segments) }}</b><span>segments</span></div>
         <div><b>{{ full(s.intersections) }}</b><span>junctions</span></div>
         <div><b>{{ s.km }}</b><span>km of road</span></div>
+      </div>
+
+      <!-- name coverage -->
+      <div class="coverage">
+        <div class="cov-head">
+          <span>Named-road coverage</span>
+          <b [class.low]="s.coveragePct < 40">{{ s.coveragePct }}%</b>
+        </div>
+        <div class="cov-bar">
+          <div class="cov-fill" [class.low]="s.coveragePct < 40"
+            [style.width.%]="s.coveragePct"></div>
+        </div>
+        <p class="cov-note muted">
+          {{ full(s.namedSegments) }} of {{ full(s.segments) }} road segments have a
+          name in OpenStreetMap.
+          @if (s.coveragePct < 40) {
+            Many roads here aren’t named yet —
+            <a [href]="osmEditUrl()" target="_blank" rel="noopener">help map this area →</a>
+          }
+        </p>
       </div>
     }
 

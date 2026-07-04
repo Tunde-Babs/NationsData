@@ -96,6 +96,54 @@
   color: var(--text-faint);
 }
 
+/* name coverage */
+.coverage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.cov-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.cov-head b {
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  color: var(--good);
+}
+.cov-head b.low {
+  color: var(--warn);
+}
+.cov-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+  margin: 8px 0;
+}
+.cov-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--good), #7be0a0);
+  transition: width 0.3s ease;
+}
+.cov-fill.low {
+  background: linear-gradient(90deg, var(--warn), #ffdd8a);
+}
+.cov-note {
+  font-size: 12px;
+  margin: 2px 0 0;
+  line-height: 1.45;
+}
+.cov-note a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .toggle {
   display: flex;
   align-items: center;

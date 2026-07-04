@@ -74,9 +74,11 @@ export interface CityInfo {
 /** A single road/street segment returned from Overpass (an OSM "way"). */
 export interface RoadSegment {
   id: number;
-  name: string;
+  name: string; // display label (real name, else ref, else "Unnamed … road")
   highway: string; // motorway | primary | residential | ...
   oneway: boolean;
+  hasName: boolean; // true if OSM carries a real `name` tag
+  identified: boolean; // has a name OR a ref number
   nodeIds: number[];
   coords: [number, number][]; // [lat, lng] points
 }
@@ -86,6 +88,8 @@ export interface Street {
   key: string;
   name: string;
   highway: string;
+  hasName: boolean;
+  identified: boolean;
   segmentIds: number[];
   lengthKm: number;
 }

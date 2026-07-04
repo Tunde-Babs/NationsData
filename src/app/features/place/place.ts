@@ -82,13 +82,17 @@ export class Place implements AfterViewInit, OnDestroy {
   readonly stats = computed(() => {
     const net = this.network();
     if (!net) return null;
-    const namedStreets = net.streets.filter((s) => s.name !== 'Unnamed road');
+    const identified = net.streets.filter((s) => s.identified);
     const totalKm = net.streets.reduce((s, x) => s + x.lengthKm, 0);
+    const total = net.segments.length;
+    const named = net.segments.filter((s) => s.hasName).length;
     return {
-      segments: net.segments.length,
-      streets: namedStreets.length,
+      segments: total,
+      streets: identified.length,
       intersections: net.intersections.length,
-      km: Math.round(totalKm * 10) / 10
+      km: Math.round(totalKm * 10) / 10,
+      namedSegments: named,
+      coveragePct: total ? Math.round((named / total) * 100) : 0
     };
   });
 
@@ -96,8 +100,14 @@ export class Place implements AfterViewInit, OnDestroy {
     const net = this.network();
     if (!net) return [];
     const q = this.streetFilter().trim().toLowerCase();
-    const list = net.streets.filter((s) => s.name !== 'Unnamed road');
+    const list = net.streets.filter((s) => s.identified);
     return q ? list.filter((s) => s.name.toLowerCase().includes(q)) : list;
+  });
+
+  /** Link to view/improve the current area in the OSM editor. */
+  readonly osmEditUrl = computed(() => {
+    const c = this.coords();
+    return c ? `https://www.openstreetmap.org/#map=17/${c[0]}/${c[1]}` : '';
   });
 
   readonly selectedStreet = computed<Street | null>(() => {

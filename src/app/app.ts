@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet, RouterLink } from '@angular/router';
 
 import { SearchBar } from './shared/search-bar/search-bar';
@@ -10,10 +11,14 @@ import { SearchBar } from './shared/search-bar/search-bar';
   styleUrl: './app.scss'
 })
 export class App {
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   protected readonly year = new Date().getFullYear();
   protected readonly theme = signal<'dark' | 'light'>(this.initialTheme());
 
   private initialTheme(): 'dark' | 'light' {
+    // On the server there is no storage/DOM — default to dark.
+    if (!this.isBrowser) return 'dark';
     try {
       const saved = localStorage.getItem('wd:theme');
       if (saved === 'light' || saved === 'dark') {
@@ -29,6 +34,7 @@ export class App {
   toggleTheme(): void {
     const next = this.theme() === 'dark' ? 'light' : 'dark';
     this.theme.set(next);
+    if (!this.isBrowser) return;
     this.applyTheme(next);
     try {
       localStorage.setItem('wd:theme', next);

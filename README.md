@@ -52,11 +52,33 @@ npm install
 npm start        # dev server at http://localhost:4200
 ```
 
-## Build
+## Build & run (SSR)
 
 ```bash
-npm run build    # production build in dist/nations-data
+npm run build              # builds browser + server bundles, prerenders home
+npm run serve:ssr:nations-data   # runs the SSR Node server (default :4000)
 ```
+
+## Server-side rendering (SEO)
+
+The app uses **`@angular/ssr`** with client hydration. Render strategy per route:
+
+| Route | Mode | Why |
+| --- | --- | --- |
+| `/` (home) | **Prerender** | Static HTML with data baked in at build time |
+| `/country/:cca3`, `/continent/:id` | **Server** | Rendered on demand so crawlers get full HTML |
+| `/place/:lat/:lng` (streets map) | **Client** | Leaflet needs `window`; not SEO-critical |
+| `/search` | **Client** | Loads the ~9 MB city dataset; not SEO-critical |
+
+Configured in [`src/app/app.routes.server.ts`](src/app/app.routes.server.ts).
+Browser-only code (Leaflet, `localStorage`, `document`) is guarded so server
+rendering never touches it.
+
+> **Deployment note:** Angular 20 validates the incoming `Host` header (SSRF
+> protection). `angular.json → security.allowedHosts` currently allows
+> `localhost`; **add your production domain there** or on-demand SSR pages fall
+> back to client rendering. SSR requires a Node runtime (Vercel, Netlify,
+> Firebase App Hosting, Render, etc. all support Angular SSR).
 
 ## Architecture
 
@@ -84,8 +106,11 @@ lazy chunks so the initial bundle stays small; they load on demand.
 
 ## Notes / next steps
 
-- **SSR/SEO**: this is a client-rendered SPA. For a public content site,
-  enabling `@angular/ssr` would improve SEO and first paint.
+- **SSR/SEO**: ✅ implemented — see the SSR section above. Remember to add your
+  production domain to `security.allowedHosts` before deploying.
 - **Overpass rate limits**: street data is fetched live and cached. A thin
   backend proxy with a shared cache (or self-hosted Overpass) would scale better
   for heavy traffic.
+- **Name coverage**: the streets page shows a "named-road coverage" indicator
+  because OpenStreetMap name completeness varies by region (rich in big cities,
+  sparse in some small towns) and links out to help map an area.
