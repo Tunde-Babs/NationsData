@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "world-data": {
+    "nations-data": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -65,10 +65,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "world-data:build:production"
+              "buildTarget": "nations-data:build:production"
             },
             "development": {
-              "buildTarget": "world-data:build:development"
+              "buildTarget": "nations-data:build:development"
             }
           },
           "defaultConfiguration": "development"

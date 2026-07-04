@@ -1,4 +1,4 @@
-# 🌍 WorldData
+# 🌍 NationsData
 
 An open, interactive atlas of the world. Browse continents and countries, dive
 into capitals, populations, currencies, GDP and land area, drill down to states
@@ -55,7 +55,7 @@ npm start        # dev server at http://localhost:4200
 ## Build
 
 ```bash
-npm run build    # production build in dist/world-data
+npm run build    # production build in dist/nations-data
 ```
 
 ## Architecture
