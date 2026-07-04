@@ -1,0 +1,53 @@
+<header class="site-header">
+  <div class="container bar">
+    <a routerLink="/" class="brand">
+      <span class="globe">🌍</span>
+      <span class="name">World<b>Data</b></span>
+    </a>
+
+    <div class="header-search">
+      <app-search-bar variant="compact" placeholder="Search countries, capitals, cities…" />
+    </div>
+
+    <nav class="nav">
+      <a routerLink="/" class="nav-link">Atlas</a>
+      <a routerLink="/search" class="nav-link">Search</a>
+      <button class="theme-toggle" (click)="toggleTheme()" aria-label="Toggle theme">
+        @if (theme() === 'dark') { ☀️ } @else { 🌙 }
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <router-outlet />
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand small">
+          <span class="globe">🌍</span>
+          <span class="name">World<b>Data</b></span>
+        </div>
+        <p class="muted">
+          An open, interactive atlas of continents, countries, cities and their
+          streets. Built with Angular.
+        </p>
+      </div>
+      <div class="sources">
+        <h4>Data sources</h4>
+        <ul class="muted">
+          <li>REST Countries — country profiles</li>
+          <li>World Bank — GDP indicators</li>
+          <li>country-state-city — states &amp; cities</li>
+          <li>OpenStreetMap / Overpass — streets &amp; roads</li>
+        </ul>
+      </div>
+    </div>
+    <div class="copy faint">
+      © {{ year }} WorldData · Map data © OpenStreetMap contributors
+    </div>
+  </div>
+</footer>

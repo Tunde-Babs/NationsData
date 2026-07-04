@@ -1,0 +1,73 @@
+<section class="section container search-page">
+  <h1>Search the world</h1>
+  <div class="page-search">
+    <app-search-bar variant="hero" />
+  </div>
+
+  @if (q().length < 2) {
+    <div class="hint muted">
+      Type at least two characters. Try “Portugal”, “Nairobi”, “Tokyo”, or a
+      street name’s city.
+    </div>
+  } @else {
+    <p class="summary muted">
+      {{ total() }} results for <b>“{{ q() }}”</b>
+    </p>
+
+    @if (total() === 0) {
+      <div class="panel empty muted">No matches. Check spelling or try a broader term.</div>
+    }
+
+    @if (countries().length) {
+      <div class="result-group">
+        <h2>Countries</h2>
+        <div class="result-grid">
+          @for (r of countries(); track r.label) {
+            <a class="result" [routerLink]="r.link" [queryParams]="r.queryParams">
+              @if (r.flagPng) { <img class="flag" [src]="r.flagPng" [alt]="r.label" /> }
+              <span class="text">
+                <b>{{ r.label }}</b>
+                <span class="muted">{{ r.sublabel }}</span>
+              </span>
+            </a>
+          }
+        </div>
+      </div>
+    }
+
+    @if (capitals().length) {
+      <div class="result-group">
+        <h2>Capitals</h2>
+        <div class="result-grid">
+          @for (r of capitals(); track r.label + r.sublabel) {
+            <a class="result" [routerLink]="r.link" [queryParams]="r.queryParams">
+              @if (r.flagPng) { <img class="flag" [src]="r.flagPng" [alt]="r.label" /> }
+              <span class="text">
+                <b>🏛️ {{ r.label }}</b>
+                <span class="muted">{{ r.sublabel }}</span>
+              </span>
+            </a>
+          }
+        </div>
+      </div>
+    }
+
+    @if (cities().length) {
+      <div class="result-group">
+        <h2>Cities <span class="muted count">(map their streets)</span></h2>
+        <div class="result-grid">
+          @for (r of cities(); track r.label + r.sublabel + r.lat) {
+            <a class="result city" [routerLink]="r.link" [queryParams]="r.queryParams">
+              <span class="pin">📍</span>
+              <span class="text">
+                <b>{{ r.label }}</b>
+                <span class="muted">{{ r.sublabel }}</span>
+              </span>
+              <span class="arrow">→</span>
+            </a>
+          }
+        </div>
+      </div>
+    }
+  }
+</section>

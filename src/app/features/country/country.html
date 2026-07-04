@@ -1,0 +1,185 @@
+@if (country(); as c) {
+  <!-- HERO -->
+  <section class="hero" [style.background]="gradient()">
+    <div class="container hero-inner">
+      <div class="crumbs">
+        <a routerLink="/">Atlas</a>
+        <span>/</span>
+        <a [routerLink]="['/continent', c.continent]">{{ meta()?.name }}</a>
+        <span>/</span>
+        <span class="cur">{{ c.name }}</span>
+      </div>
+      <div class="hero-main">
+        <img class="flag" [src]="c.flagPng" [alt]="c.flagAlt" />
+        <div>
+          <h1>{{ c.name }}</h1>
+          <p class="official">{{ c.officialName }}</p>
+          <div class="tags">
+            <span class="chip light">{{ meta()?.emoji }} {{ meta()?.name }}</span>
+            <span class="chip light">{{ c.subregion || c.region }}</span>
+            <span class="chip light">{{ c.cca2 }} · {{ c.cca3 }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEY STATS -->
+  <section class="section container">
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="label">Capital</div>
+        <div class="value">{{ c.capital[0] || '—' }}</div>
+        @if (capitalCity(); as cap) {
+          <a class="ministreets"
+            [routerLink]="['/place', cap.latitude, cap.longitude]"
+            [queryParams]="{ name: cap.name, country: c.name, cca3: c.cca3 }">
+            View streets →
+          </a>
+        }
+      </div>
+      <div class="stat">
+        <div class="label">Population</div>
+        <div class="value">{{ compact(c.population) }}<small> · {{ full(c.population) }}</small></div>
+      </div>
+      <div class="stat">
+        <div class="label">Land area</div>
+        <div class="value">{{ compact(c.area) }} <small>km²</small></div>
+      </div>
+      <div class="stat">
+        <div class="label">Density</div>
+        <div class="value">{{ density(c.population, c.area) }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">GDP / capita</div>
+        <div class="value">
+          {{ usd(c.economy.gdpPerCapitaUsd, false) }}
+          @if (c.economy.year) { <small> · {{ c.economy.year }}</small> }
+        </div>
+      </div>
+      <div class="stat">
+        <div class="label">Total GDP</div>
+        <div class="value">{{ usd(c.economy.gdpTotalUsd) }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Currency</div>
+        <div class="value small-val">
+          @for (cur of c.currencies; track cur.code) {
+            <div>{{ cur.name }} <span class="muted">({{ cur.symbol || cur.code }})</span></div>
+          } @empty { — }
+        </div>
+      </div>
+      <div class="stat">
+        <div class="label">Languages</div>
+        <div class="value small-val">{{ c.languages.join(', ') || '—' }}</div>
+      </div>
+    </div>
+
+    <!-- DETAIL ROW -->
+    <div class="detail-row">
+      <div class="panel detail">
+        <h3>At a glance</h3>
+        <dl>
+          <div><dt>Region</dt><dd>{{ c.region }} · {{ c.subregion }}</dd></div>
+          <div><dt>Internet TLD</dt><dd>{{ c.tld.join(', ') || '—' }}</dd></div>
+          <div><dt>Coordinates</dt><dd>{{ c.latlng[0] }}, {{ c.latlng[1] }}</dd></div>
+          <div>
+            <dt>Map</dt>
+            <dd>
+              @if (c.mapsUrl) { <a [href]="c.mapsUrl" target="_blank" rel="noopener">Open in OpenStreetMap →</a> }
+              @else { — }
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="panel detail">
+        <h3>Neighbouring countries</h3>
+        @if (borderCountries().length) {
+          <div class="borders">
+            @for (b of borderCountries(); track b.cca3) {
+              <a class="border" [routerLink]="['/country', b.cca3]">
+                <img [src]="b.flagPng" [alt]="b.flagAlt" />
+                <span>{{ b.name }}</span>
+              </a>
+            }
+          </div>
+        } @else {
+          <p class="muted">No land borders — an island or isolated nation.</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- STATES & CITIES -->
+  <section class="section container">
+    <div class="section-head">
+      <div>
+        <h2>Regions &amp; cities</h2>
+        <p class="muted">
+          {{ states().length }} regions · {{ full(cityCount()) }} cities.
+          Select a city to map its streets &amp; roads.
+        </p>
+      </div>
+    </div>
+
+    <div class="places">
+      <aside class="states panel">
+        <div class="states-head">Regions / states</div>
+        <div class="states-list">
+          <button class="state" [class.active]="selectedState() === null"
+            (click)="selectState(null)">
+            <span>All cities</span>
+            <span class="chip">{{ full(countryCitiesLength()) }}</span>
+          </button>
+          @for (s of states(); track s.isoCode) {
+            <button class="state" [class.active]="selectedState() === s.isoCode"
+              (click)="selectState(s.isoCode)">
+              <span>{{ s.name }}</span>
+            </button>
+          } @empty {
+            <div class="muted no-states">No sub-regions in dataset.</div>
+          }
+        </div>
+      </aside>
+
+      <div class="cities panel">
+        <div class="cities-head">
+          <input
+            type="search"
+            placeholder="Filter cities…"
+            [value]="cityFilter()"
+            (input)="cityFilter.set($any($event.target).value)" />
+          <span class="muted count">{{ cities().length }} shown</span>
+        </div>
+        @if (cities().length) {
+          <div class="city-grid">
+            @for (city of cities(); track city.name + city.stateCode) {
+              <a class="city"
+                [routerLink]="['/place', city.latitude, city.longitude]"
+                [queryParams]="{ name: city.name, country: c.name, cca3: c.cca3 }">
+                <span class="pin">📍</span>
+                <span class="cname">{{ city.name }}</span>
+                <span class="arrow">→</span>
+              </a>
+            }
+          </div>
+          @if (cityCount() > cities().length) {
+            <p class="muted more">
+              Showing first {{ cities().length }} of {{ full(cityCount()) }} — refine with the filter above.
+            </p>
+          }
+        } @else {
+          <div class="muted no-cities">No cities found for this selection.</div>
+        }
+      </div>
+    </div>
+  </section>
+} @else {
+  <section class="section container">
+    <div class="panel loading-block">
+      <span class="spin big">◐</span>
+      <p class="muted">Loading country…</p>
+    </div>
+  </section>
+}

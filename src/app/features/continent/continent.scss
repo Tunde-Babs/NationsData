@@ -1,0 +1,158 @@
+.banner {
+  color: #fff;
+  padding: 26px 0 30px;
+  position: relative;
+}
+.banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.45));
+  pointer-events: none;
+}
+.banner-inner {
+  position: relative;
+  z-index: 1;
+}
+.back {
+  display: inline-block;
+  font-size: 13.5px;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-bottom: 18px;
+}
+.back:hover {
+  opacity: 1;
+}
+.banner-main {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.banner-main .emoji {
+  font-size: 60px;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.4));
+}
+.banner-main h1 {
+  font-size: clamp(30px, 5vw, 46px);
+}
+.banner-main p {
+  margin: 6px 0 0;
+  max-width: 55ch;
+  opacity: 0.92;
+  font-size: 15px;
+}
+.banner-stats {
+  display: flex;
+  gap: 22px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+.banner-stats b {
+  font-family: 'Sora', sans-serif;
+  font-size: 18px;
+}
+
+/* toolbar */
+.toolbar {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.toolbar .field {
+  flex: 1;
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px 14px;
+  display: flex;
+  align-items: center;
+}
+.toolbar input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  padding: 9px 0;
+}
+.sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+}
+.sort select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+/* country grid */
+.country-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+.country-card {
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.country-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+}
+.cc-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.flag {
+  width: 58px;
+  height: 39px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.code {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+.country-card h3 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.cap {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.metrics {
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.empty {
+  padding: 40px;
+  text-align: center;
+}
+.empty h2 {
+  margin-bottom: 8px;
+}
+.empty a {
+  color: var(--accent);
+  font-weight: 600;
+}

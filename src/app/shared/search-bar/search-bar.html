@@ -1,0 +1,53 @@
+<div class="search" [class.hero]="variant() === 'hero'" [class.compact]="variant() === 'compact'" #box>
+  <div class="field">
+    <svg class="icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        d="M21 21l-4.3-4.3M11 19a8 8 0 100-16 8 8 0 000 16z" />
+    </svg>
+    <input
+      type="search"
+      [placeholder]="placeholder()"
+      [value]="query()"
+      (input)="onInput($any($event.target).value)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (keydown)="onKeydown($event)"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="Search" />
+    @if (variant() === 'hero') {
+      <button class="btn btn-primary go" (click)="submit()">Search</button>
+    }
+  </div>
+
+  @if (open() && query().length >= 2) {
+    <div class="dropdown panel">
+      @if (suggestions().length === 0) {
+        <div class="empty muted">No quick matches — press Enter for full search.</div>
+      } @else {
+        @for (s of suggestions(); track s.label + s.kind; let i = $index) {
+          <a
+            class="row"
+            [class.active]="i === activeIndex()"
+            [routerLink]="s.link"
+            [queryParams]="s.queryParams"
+            (click)="open.set(false)">
+            @if (s.flagPng) {
+              <img class="flag" [src]="s.flagPng" [alt]="s.label" loading="lazy" />
+            } @else {
+              <span class="dot" [attr.data-kind]="s.kind"></span>
+            }
+            <span class="text">
+              <span class="label">{{ s.label }}</span>
+              <span class="sub muted">{{ s.sublabel }}</span>
+            </span>
+            <span class="kind chip">{{ s.kind }}</span>
+          </a>
+        }
+        <button class="row seeall" (click)="submit()">
+          Search everything for “{{ query() }}” →
+        </button>
+      }
+    </div>
+  }
+</div>

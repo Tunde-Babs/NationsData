@@ -1,0 +1,296 @@
+/* ---------- hero ---------- */
+.hero {
+  color: #fff;
+  padding: 24px 0 34px;
+  position: relative;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.5));
+}
+.hero-inner {
+  position: relative;
+  z-index: 1;
+}
+.crumbs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+.crumbs a:hover {
+  text-decoration: underline;
+}
+.crumbs .cur {
+  font-weight: 700;
+}
+.hero-main {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.hero-main .flag {
+  width: 128px;
+  height: 86px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  flex: none;
+}
+.hero-main h1 {
+  font-size: clamp(30px, 5vw, 48px);
+}
+.official {
+  margin: 4px 0 12px;
+  opacity: 0.9;
+  font-size: 15px;
+}
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.chip.light {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+/* ---------- stat grid ---------- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+.stat .ministreets {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.small-val {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ---------- detail row ---------- */
+.detail-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.detail {
+  padding: 20px 22px;
+}
+.detail h3 {
+  font-size: 17px;
+  margin-bottom: 14px;
+}
+dl {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+dl > div {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 10px;
+  font-size: 14px;
+}
+dt {
+  color: var(--text-faint);
+}
+dd {
+  margin: 0;
+}
+dd a {
+  color: var(--accent);
+  font-weight: 600;
+}
+.borders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.border {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 7px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.border:hover {
+  border-color: var(--accent);
+}
+.border img {
+  width: 26px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+/* ---------- section head ---------- */
+.section-head h2 {
+  font-size: 26px;
+}
+.section-head p {
+  margin-top: 4px;
+  font-size: 14.5px;
+}
+
+/* ---------- places ---------- */
+.places {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  margin-top: 22px;
+}
+.states {
+  padding: 12px;
+  max-height: 560px;
+  display: flex;
+  flex-direction: column;
+}
+.states-head {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+  padding: 6px 8px 10px;
+}
+.states-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+}
+.state:hover {
+  background: var(--surface-2);
+}
+.state.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--text);
+  font-weight: 600;
+}
+.no-states {
+  padding: 10px;
+  font-size: 13px;
+}
+
+.cities {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+}
+.cities-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.cities-head input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 13px;
+  outline: none;
+  font-size: 14px;
+}
+.cities-head .count {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.city-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 520px;
+}
+.city {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  font-size: 14px;
+}
+.city:hover {
+  border-color: var(--accent);
+}
+.city .cname {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.city .arrow {
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.14s ease;
+}
+.city:hover .arrow {
+  opacity: 1;
+}
+.more {
+  margin-top: 12px;
+  font-size: 13px;
+}
+.no-cities,
+.no-states {
+  padding: 20px;
+  text-align: center;
+}
+
+/* ---------- loading ---------- */
+.loading-block {
+  padding: 60px;
+  text-align: center;
+}
+.spin.big {
+  font-size: 34px;
+  display: inline-block;
+}
+
+@media (max-width: 860px) {
+  .detail-row {
+    grid-template-columns: 1fr;
+  }
+  .places {
+    grid-template-columns: 1fr;
+  }
+  .states {
+    max-height: 260px;
+  }
+}

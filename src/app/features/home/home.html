@@ -1,0 +1,109 @@
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <span class="eyebrow chip">🌐 An open atlas of the world</span>
+      <h1 class="title">
+        Explore the planet,<br />
+        <span class="grad">country by country.</span>
+      </h1>
+      <p class="lede muted">
+        Browse continents and countries, dive into capitals, populations,
+        currencies, GDP and land area — then drill down to cities and map their
+        interconnected streets and roads.
+      </p>
+
+      <div class="hero-search">
+        <app-search-bar variant="hero" />
+      </div>
+
+      <div class="hero-stats">
+        <div class="hstat">
+          <b>{{ totals().countries || '—' }}</b><span class="muted">countries</span>
+        </div>
+        <div class="dotsep"></div>
+        <div class="hstat">
+          <b>7</b><span class="muted">continents</span>
+        </div>
+        <div class="dotsep"></div>
+        <div class="hstat">
+          <b>{{ compact(totals().population) }}</b><span class="muted">people</span>
+        </div>
+        <div class="dotsep"></div>
+        <div class="hstat">
+          <b>{{ compact(totals().area) }}</b><span class="muted">km² of land</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTINENTS -->
+<section class="section container">
+  <div class="section-head">
+    <div>
+      <h2>Continents</h2>
+      <p class="muted">Pick a continent to browse its countries.</p>
+    </div>
+    @if (loading()) {
+      <span class="chip"><span class="spin">◐</span> loading world data…</span>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="panel error">
+      {{ error() }}
+    </div>
+  }
+
+  <div class="continent-grid">
+    @for (card of cards(); track card.id) {
+      <a class="continent-card" [routerLink]="['/continent', card.id]"
+        [style.background]="gradient(card)">
+        <div class="overlay"></div>
+        <div class="cc-top">
+          <span class="cc-emoji">{{ card.emoji }}</span>
+          <span class="cc-count">{{ card.count || '—' }} countries</span>
+        </div>
+        <div class="cc-body">
+          <h3>{{ card.name }}</h3>
+          <p>{{ card.blurb }}</p>
+        </div>
+        <div class="cc-foot">
+          <span>👥 {{ compact(card.population) }}</span>
+          <span class="cc-go">Explore →</span>
+        </div>
+      </a>
+    }
+  </div>
+</section>
+
+<!-- FEATURED -->
+<section class="section container">
+  <div class="section-head">
+    <div>
+      <h2>Most populous nations</h2>
+      <p class="muted">A quick way in — the world's biggest by population.</p>
+    </div>
+  </div>
+
+  @if (loading() && featured().length === 0) {
+    <div class="featured-grid">
+      @for (i of [1,2,3,4,5,6,7,8]; track i) {
+        <div class="skeleton" style="height: 84px"></div>
+      }
+    </div>
+  } @else {
+    <div class="featured-grid">
+      @for (c of featured(); track c.cca3) {
+        <a class="mini-card" [routerLink]="['/country', c.cca3]">
+          <img class="flag" [src]="c.flagPng" [alt]="c.flagAlt" loading="lazy" />
+          <div class="mini-text">
+            <b>{{ c.name }}</b>
+            <span class="muted">{{ compact(c.population) }} · {{ c.capital[0] || '—' }}</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</section>

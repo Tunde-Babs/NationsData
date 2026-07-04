@@ -1,0 +1,311 @@
+:host {
+  display: block;
+}
+.place {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  height: calc(100vh - 66px);
+  min-height: 560px;
+}
+
+/* ---------- sidebar ---------- */
+.side {
+  border-right: 1px solid var(--border);
+  background: var(--bg-2);
+  overflow-y: auto;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.back {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.side-head h1 {
+  font-size: 24px;
+  margin: 10px 0 6px;
+}
+.sub {
+  font-size: 13px;
+}
+.notice {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13.5px;
+}
+.notice.warn {
+  background: color-mix(in srgb, var(--warn) 16%, transparent);
+  border: 1px solid var(--warn);
+  color: var(--text);
+}
+
+/* radius control */
+.control-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  display: block;
+  margin-bottom: 8px;
+}
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 5px;
+}
+.segmented button {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  padding: 8px 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.segmented button.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+}
+
+/* mini stats */
+.mini-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.mini-stats > div {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 13px;
+  display: flex;
+  flex-direction: column;
+}
+.mini-stats b {
+  font-family: 'Sora', sans-serif;
+  font-size: 19px;
+}
+.mini-stats span {
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+/* selected street */
+.selected {
+  padding: 14px;
+}
+.sel-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sel-top b {
+  display: block;
+  font-size: 15px;
+}
+.sel-top .muted {
+  font-size: 12px;
+  text-transform: capitalize;
+}
+.connects {
+  margin: 12px 0 8px;
+  font-size: 13px;
+}
+.connect-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.connect {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 12.5px;
+  color: var(--text);
+}
+.connect:hover {
+  border-color: var(--warn);
+}
+
+/* street list */
+.streets {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 160px;
+}
+.streets-head input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.street-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+.street {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  padding: 9px 10px;
+  border-radius: 9px;
+  font-size: 13.5px;
+}
+.street:hover {
+  background: var(--surface-2);
+}
+.street.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  font-weight: 600;
+}
+.st-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.st-len {
+  font-size: 12px;
+}
+.no-streets {
+  padding: 20px;
+  text-align: center;
+  font-size: 13.5px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex: none;
+  display: inline-block;
+}
+.swatch.sm {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* ---------- map ---------- */
+.map-wrap {
+  position: relative;
+}
+.map {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+}
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(3px);
+  text-align: center;
+  padding: 20px;
+}
+.map-overlay .spin.big {
+  font-size: 40px;
+}
+.map-overlay .err {
+  color: var(--danger);
+  max-width: 40ch;
+}
+.legend {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 500;
+  padding: 12px 14px;
+  font-size: 12px;
+}
+.legend b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+/* Leaflet tooltip theming */
+:host ::ng-deep .leaflet-tooltip {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  font-weight: 600;
+}
+:host ::ng-deep .leaflet-tooltip-top::before {
+  border-top-color: var(--border);
+}
+:host ::ng-deep .leaflet-control-attribution {
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  color: var(--text-faint);
+}
+:host ::ng-deep .leaflet-control-attribution a {
+  color: var(--accent);
+}
+
+@media (max-width: 860px) {
+  .place {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .side {
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .map-wrap {
+    height: 70vh;
+  }
+}

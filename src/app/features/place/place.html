@@ -1,0 +1,135 @@
+<section class="place">
+  <!-- Sidebar -->
+  <aside class="side">
+    <div class="side-head">
+      <a class="back" [routerLink]="cca3() ? ['/country', cca3()] : ['/']">
+        ← {{ country() || 'Back' }}
+      </a>
+      <h1>{{ name() || 'Streets & roads' }}</h1>
+      <p class="muted sub">
+        Live road network from OpenStreetMap. Click any street to trace how it
+        interconnects with its neighbours.
+      </p>
+    </div>
+
+    @if (!coords()) {
+      <div class="notice warn">
+        No coordinates for this place, so its streets can’t be mapped.
+      </div>
+    }
+
+    <!-- radius control -->
+    <div class="control">
+      <span class="control-label">Area radius</span>
+      <div class="segmented">
+        @for (r of [0.7, 1.1, 1.6, 2.2]; track r) {
+          <button [class.active]="radiusKm() === r" (click)="setRadius(r)">
+            {{ r }}km
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- stats -->
+    @if (stats(); as s) {
+      <div class="mini-stats">
+        <div><b>{{ full(s.streets) }}</b><span>named streets</span></div>
+        <div><b>{{ full(s.segments) }}</b><span>segments</span></div>
+        <div><b>{{ full(s.intersections) }}</b><span>junctions</span></div>
+        <div><b>{{ s.km }}</b><span>km of road</span></div>
+      </div>
+    }
+
+    <label class="toggle">
+      <input type="checkbox" [checked]="showIntersections()" (change)="toggleIntersections()" />
+      <span>Show junctions</span>
+    </label>
+
+    <!-- selected street / interconnections -->
+    @if (selectedStreet(); as sel) {
+      <div class="selected panel">
+        <div class="sel-top">
+          <span class="swatch" [style.background]="colorFor(sel.highway)"></span>
+          <div>
+            <b>{{ sel.name }}</b>
+            <span class="muted">{{ sel.highway }} · {{ sel.lengthKm }} km</span>
+          </div>
+        </div>
+        <div class="connects">
+          Interconnects with <b>{{ connectedStreets().length }}</b> streets:
+        </div>
+        <div class="connect-list">
+          @for (cs of connectedStreets(); track cs.key) {
+            <button class="connect" (click)="selectStreet(cs.key)">
+              <span class="swatch sm" [style.background]="colorFor(cs.highway)"></span>
+              {{ cs.name }}
+            </button>
+          } @empty {
+            <span class="muted">No named connecting streets in range.</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- street list -->
+    <div class="streets">
+      <div class="streets-head">
+        <input
+          type="search"
+          placeholder="Filter streets…"
+          [value]="streetFilter()"
+          (input)="streetFilter.set($any($event.target).value)" />
+      </div>
+      <div class="street-list">
+        @if (loading()) {
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="skeleton" style="height: 40px; margin-bottom: 6px"></div>
+          }
+        } @else {
+          @for (st of streets(); track st.key) {
+            <button class="street" [class.active]="selectedKey() === st.key"
+              (click)="selectStreet(st.key)">
+              <span class="swatch sm" [style.background]="colorFor(st.highway)"></span>
+              <span class="st-name">{{ st.name }}</span>
+              <span class="st-len muted">{{ st.lengthKm }}km</span>
+            </button>
+          } @empty {
+            <div class="muted no-streets">
+              @if (streetFilter()) { No streets match “{{ streetFilter() }}”. }
+              @else { No named streets found in this area. }
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </aside>
+
+  <!-- Map -->
+  <div class="map-wrap">
+    <div #mapEl class="map"></div>
+
+    @if (loading()) {
+      <div class="map-overlay">
+        <span class="spin big">◐</span>
+        <p>Fetching streets & roads…</p>
+        <small class="muted">Querying OpenStreetMap · Overpass</small>
+      </div>
+    }
+    @if (error()) {
+      <div class="map-overlay">
+        <p class="err">{{ error() }}</p>
+        <button class="btn btn-primary" (click)="retry()">Retry</button>
+      </div>
+    }
+
+    <!-- legend -->
+    <div class="legend panel">
+      <b>Road class</b>
+      <div class="legend-row"><span class="swatch sm" style="background:#ff5e6c"></span>Motorway / trunk</div>
+      <div class="legend-row"><span class="swatch sm" style="background:#ffa24d"></span>Primary</div>
+      <div class="legend-row"><span class="swatch sm" style="background:#ffd24d"></span>Secondary</div>
+      <div class="legend-row"><span class="swatch sm" style="background:#9be86a"></span>Tertiary</div>
+      <div class="legend-row"><span class="swatch sm" style="background:#5b8cff"></span>Residential</div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,146 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.search {
+  position: relative;
+  width: 100%;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px 8px 8px 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(91, 140, 255, 0.15);
+}
+
+.icon {
+  color: var(--text-faint);
+  flex: none;
+}
+
+input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  padding: 6px 0;
+}
+input::placeholder {
+  color: var(--text-faint);
+}
+
+.hero .field {
+  padding: 10px 10px 10px 18px;
+  border-radius: 16px;
+}
+.hero input {
+  font-size: 17px;
+  padding: 10px 0;
+}
+.go {
+  flex: none;
+}
+
+.compact .field {
+  padding: 6px 6px 6px 12px;
+  border-radius: 12px;
+}
+.compact input {
+  font-size: 14px;
+}
+
+/* dropdown */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  padding: 6px;
+  max-height: 380px;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+}
+.row:hover,
+.row.active {
+  background: var(--surface-2);
+}
+
+.flag {
+  width: 30px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex: none;
+  border: 1px solid var(--border);
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+.dot[data-kind='city'] {
+  background: var(--good);
+}
+.dot[data-kind='capital'] {
+  background: var(--warn);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.label {
+  font-weight: 600;
+  font-size: 14px;
+}
+.sub {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kind {
+  text-transform: capitalize;
+  font-size: 11px;
+}
+.seeall {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 13.5px;
+  justify-content: flex-start;
+}
+.empty {
+  padding: 14px;
+  font-size: 13.5px;
+  text-align: center;
+}

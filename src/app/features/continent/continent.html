@@ -1,0 +1,73 @@
+@if (meta(); as m) {
+  <section class="banner" [style.background]="gradient()">
+    <div class="container banner-inner">
+      <a routerLink="/" class="back">← All continents</a>
+      <div class="banner-main">
+        <span class="emoji">{{ m.emoji }}</span>
+        <div>
+          <h1>{{ m.name }}</h1>
+          <p>{{ m.blurb }}</p>
+        </div>
+      </div>
+      <div class="banner-stats">
+        <span><b>{{ totals().count }}</b> countries</span>
+        <span><b>{{ compact(totals().population) }}</b> people</span>
+        <span><b>{{ compact(totals().area) }}</b> km²</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="toolbar">
+      <div class="field">
+        <input
+          type="search"
+          placeholder="Filter countries in {{ m.name }}…"
+          [value]="filter()"
+          (input)="filter.set($any($event.target).value)" />
+      </div>
+      <label class="sort">
+        <span class="muted">Sort by</span>
+        <select [value]="sort()" (change)="setSort($any($event.target).value)">
+          <option value="population">Population</option>
+          <option value="area">Land area</option>
+          <option value="name">Name (A–Z)</option>
+        </select>
+      </label>
+    </div>
+
+    @if (loading() && countries().length === 0) {
+      <div class="country-grid">
+        @for (i of [1,2,3,4,5,6,7,8]; track i) {
+          <div class="skeleton" style="height: 150px"></div>
+        }
+      </div>
+    } @else if (countries().length === 0) {
+      <div class="panel empty muted">No countries match “{{ filter() }}”.</div>
+    } @else {
+      <div class="country-grid">
+        @for (c of countries(); track c.cca3) {
+          <a class="country-card" [routerLink]="['/country', c.cca3]">
+            <div class="cc-head">
+              <img class="flag" [src]="c.flagPng" [alt]="c.flagAlt" loading="lazy" />
+              <span class="code chip">{{ c.cca3 }}</span>
+            </div>
+            <h3>{{ c.name }}</h3>
+            <div class="cap muted">🏛️ {{ c.capital[0] || 'No capital' }}</div>
+            <div class="metrics">
+              <span>👥 {{ compact(c.population) }}</span>
+              <span>📐 {{ compact(c.area) }} km²</span>
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </section>
+} @else {
+  <section class="section container">
+    <div class="panel empty">
+      <h2>Unknown continent</h2>
+      <p class="muted">That continent doesn’t exist. <a routerLink="/">Back to the atlas →</a></p>
+    </div>
+  </section>
+}
