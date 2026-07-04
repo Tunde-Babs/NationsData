@@ -40,7 +40,9 @@
             "outputMode": "server",
             "security": {
               "allowedHosts": [
-                "localhost"
+                "localhost",
+                "thenationsdata.com",
+                "www.thenationsdata.com"
               ]
             },
             "ssr": {
