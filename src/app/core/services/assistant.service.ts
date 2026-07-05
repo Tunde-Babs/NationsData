@@ -90,7 +90,7 @@ export class AssistantService {
       return this.founded(c);
 
     if (
-      /president|king|queen|monarch|emperor|ruler|leader|prime minister|head of state|head of government|\bpm\b|who (rules|ruled|leads|led|governs|governed|is in charge|is the leader|was the leader)/.test(
+      /president|king|queen|monarch|emperor|ruler|leader|prime minister|head of state|head of government|chancellor|premier|taoiseach|sultan|\bpm\b|who (rules|ruled|leads|led|governs|governed|is in charge|is the leader|was the leader)/.test(
         q
       )
     ) {
@@ -192,13 +192,27 @@ export class AssistantService {
   }
 
   private leaders(c: Country, q: string): Observable<AssistantAnswer> {
-    const pm = /prime minister|head of government|\bpm\b/.test(q);
-    const role = pm ? 'head of government' : 'head of state';
+    const pm = /prime minister|head of government|chancellor|premier|taoiseach|\bpm\b/.test(q);
+    const role = pm
+      ? /chancellor/.test(q)
+        ? 'chancellor'
+        : /taoiseach/.test(q)
+          ? 'Taoiseach'
+          : /premier/.test(q)
+            ? 'premier'
+            : 'head of government'
+      : 'head of state';
     const yearMatch = q.match(/\b(1[5-9]\d{2}|20\d{2})\b/);
     const year = yearMatch ? Number(yearMatch[1]) : null;
     const wantsFirst = /\bfirst\b|\bearliest\b/.test(q);
     const wantsList = /\blist\b|\ball\b|every|past and present|full list|history of/.test(q);
-    const roleTitle = pm ? 'Heads of government' : 'Heads of state';
+    const roleTitle = pm
+      ? /chancellor/.test(q)
+        ? 'Chancellors'
+        : /premier/.test(q)
+          ? 'Premiers'
+          : 'Heads of government'
+      : 'Heads of state';
 
     return this.wiki.leaders(c.cca2, pm ? 'P6' : 'P35').pipe(
       map((reigns): AssistantAnswer => {
