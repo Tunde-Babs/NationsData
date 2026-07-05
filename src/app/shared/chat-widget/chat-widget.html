@@ -1,0 +1,60 @@
+@if (open()) {
+  <div class="panel card">
+    <div class="head">
+      <div class="title">
+        <span class="dot"></span>
+        <div>
+          <b>NationsData Assistant</b>
+          <span class="muted">Facts &amp; history · no sign-in</span>
+        </div>
+      </div>
+      <button class="close" (click)="toggle()" aria-label="Close chat">✕</button>
+    </div>
+
+    <div class="messages" #scroll>
+      @for (m of messages(); track $index) {
+        <div class="msg" [class.user]="m.role === 'user'" [class.bot]="m.role === 'bot'">
+          <div class="bubble">
+            {{ m.text }}
+            @if (m.link) {
+              <a class="go" [routerLink]="m.link" (click)="toggle()">Open page →</a>
+            }
+          </div>
+        </div>
+      }
+      @if (loading()) {
+        <div class="msg bot">
+          <div class="bubble typing">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (messages().length <= 1) {
+      <div class="suggestions">
+        @for (s of suggestions; track s) {
+          <button class="chip" (click)="send(s)">{{ s }}</button>
+        }
+      </div>
+    }
+
+    <div class="composer">
+      <input
+        type="text"
+        placeholder="Ask about any country…"
+        [value]="input()"
+        (input)="input.set($any($event.target).value)"
+        (keydown)="onKeydown($event)"
+        aria-label="Ask the assistant" />
+      <button class="send" (click)="send()" [disabled]="loading()" aria-label="Send">
+        ➤
+      </button>
+    </div>
+  </div>
+}
+
+<button class="fab" (click)="toggle()" [class.hidden]="open()" aria-label="Open assistant">
+  <span class="fab-emoji">💬</span>
+  <span class="fab-text">Ask NationsData</span>
+</button>

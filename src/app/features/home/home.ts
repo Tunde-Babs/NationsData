@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { CountriesService } from '../../core/services/countries.service';
 import { CONTINENTS } from '../../core/data/continents';
 import { SearchBar } from '../../shared/search-bar/search-bar';
+import { ChatWidget } from '../../shared/chat-widget/chat-widget';
 import { Country, ContinentMeta } from '../../core/models/geo.models';
 import { compact, full } from '../../core/util/format';
 
@@ -15,7 +16,7 @@ interface ContinentCard extends ContinentMeta {
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, SearchBar],
+  imports: [RouterLink, SearchBar, ChatWidget],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
