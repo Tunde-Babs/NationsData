@@ -21,11 +21,18 @@ defaults:
     working-directory: nations-data-e2e
 
 jobs:
-  # Fast gate — Chromium — on every push / PR / manual / nightly run.
+  # Fast gate on every push / PR: desktop (Chromium) + phone (Mobile/WebKit).
+  # The mobile project runs on the WebKit engine, so it installs `webkit`.
   smoke:
-    name: Smoke (chromium)
+    name: Smoke (${{ matrix.project }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { project: chromium, browser: chromium }
+          - { project: mobile, browser: webkit }
     steps:
       - uses: actions/checkout@v4
 
@@ -38,11 +45,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install ${{ matrix.browser }}
+        run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run smoke tests
-        run: npm run smoke:chromium
+        run: npx playwright test --grep @smoke --project=${{ matrix.project }}
         env:
           BASE_URL: ${{ vars.BASE_URL || 'https://www.thenationsdata.com' }}
 
@@ -50,7 +57,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report-chromium
+          name: playwright-report-${{ matrix.project }}
           path: nations-data-e2e/playwright-report
           retention-days: 14
 
