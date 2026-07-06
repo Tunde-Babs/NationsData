@@ -55,6 +55,12 @@ const LEADERS: Record<string, Reign[]> = {
     ['George VI', '1936-12-11', '1952-02-06'],
     ['Edward VIII', '1936-01-20', '1936-12-11'],
     ['George V', '1910-05-06', '1936-01-20']
+  ],
+  US: [
+    ['Donald Trump', '2025-01-20', null],
+    ['Joe Biden', '2021-01-20', '2025-01-20'],
+    ['Barack Obama', '2009-01-20', '2017-01-20'],
+    ['George Washington', '1789-04-30', '1797-03-04']
   ]
 };
 const INCEPTION: Record<string, string> = { BR: '1822-09-07', KE: '1963-12-12' };
