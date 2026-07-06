@@ -6,6 +6,11 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
+    "regression": "playwright test --grep @regression",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:mobile": "playwright test --project=mobile",
     "smoke": "playwright test --grep @smoke",
     "smoke:chromium": "playwright test --project=chromium --grep @smoke",
     "smoke:firefox": "playwright test --project=firefox --grep @smoke",

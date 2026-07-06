@@ -21,4 +21,14 @@ export class ContinentPage {
   async filter(text: string): Promise<void> {
     await this.filterInput.fill(text);
   }
+
+  /** value is one of 'population' | 'area' | 'name'. */
+  async sortBy(value: string): Promise<void> {
+    await this.sortSelect.selectOption(value);
+  }
+
+  /** Names of the country cards in current DOM order. */
+  async cardNames(): Promise<string[]> {
+    return this.countryCards.locator('h3').allInnerTexts();
+  }
 }

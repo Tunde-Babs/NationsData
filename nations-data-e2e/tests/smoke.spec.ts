@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
+import { HeaderComponent } from '../pages/HeaderComponent';
 import { ContinentPage } from '../pages/ContinentPage';
 import { CountryPage } from '../pages/CountryPage';
 import { PlacePage } from '../pages/PlacePage';
@@ -36,13 +37,11 @@ test.describe('NationsData · Smoke @smoke', () => {
   });
 
   test('TS2-04/05 · theme toggle switches and persists across reload', async ({ page }) => {
-    const home = new HomePage(page);
-    await home.goto();
-    const html = page.locator('html');
-    await home.themeToggle.click();
-    await expect(html).toHaveAttribute('data-theme', 'light');
+    await page.goto('/');
+    const header = new HeaderComponent(page);
+    await header.ensureLight();
     await page.reload();
-    await expect(html).toHaveAttribute('data-theme', 'light');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   });
 
   test('TS1-04 · continent card navigates to continent page', async ({ page }) => {
