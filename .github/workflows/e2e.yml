@@ -1,0 +1,93 @@
+name: E2E Smoke
+
+# Smoke suite for NationsData. Runs against production by default; override the
+# target with a repository variable `BASE_URL` (Settings → Variables) to point at
+# a preview/staging deployment.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *' # nightly at 06:00 UTC
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: nations-data-e2e
+
+jobs:
+  # Fast gate — Chromium — on every push / PR / manual / nightly run.
+  smoke:
+    name: Smoke (chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: nations-data-e2e/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke tests
+        run: npm run smoke:chromium
+        env:
+          BASE_URL: ${{ vars.BASE_URL || 'https://www.thenationsdata.com' }}
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-chromium
+          path: nations-data-e2e/playwright-report
+          retention-days: 14
+
+  # Broader coverage — Firefox + WebKit — nightly and on demand only.
+  cross-browser:
+    name: Smoke (${{ matrix.browser }})
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: nations-data-e2e/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install ${{ matrix.browser }}
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run smoke tests
+        run: npx playwright test --grep @smoke --project=${{ matrix.browser }}
+        env:
+          BASE_URL: ${{ vars.BASE_URL || 'https://www.thenationsdata.com' }}
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: nations-data-e2e/playwright-report
+          retention-days: 14
