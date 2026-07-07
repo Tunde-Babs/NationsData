@@ -80,17 +80,32 @@ npm run visual:update    # re-baseline after an *intended* design change, then c
 - **Tolerance** — a 10% pixel budget (`playwright.config.ts → expect.toHaveScreenshot`)
   means the live hero stats (country/population totals) can change without a false
   failure, while a real background regression (repaints ~every pixel) still fails.
-- **Chromium-only, one baseline set** — other engines render pixels differently and
-  would each need their own baselines.
-- **Baselines are platform-specific** (font antialiasing differs by OS). The
-  committed baselines are `*-darwin.png`; the suite **skips on CI** until matching
-  Linux baselines exist. To generate them, run the update in the pinned Playwright
-  Linux image and commit the `*-linux.png` files, then drop the `test.skip(CI)`:
+- **Chromium-only, one engine's baselines** — other engines render pixels
+  differently and would each need their own set.
+- **Baselines are platform-specific** (font antialiasing differs by OS). Playwright
+  suffixes them per platform, so both sets are committed and each environment uses
+  its own: **`*-darwin.png` locally**, **`*-linux.png` on CI** (Ubuntu). Refresh the
+  macOS set with `npm run visual:update`.
 
-  ```bash
-  docker run --rm -v "$PWD":/e2e -w /e2e mcr.microsoft.com/playwright:v1.49.1-jammy \
-    npm ci && npx playwright test --project=chromium --grep @visual --update-snapshots
-  ```
+### Running visual tests in CI
+
+The `visual` job in `.github/workflows/e2e.yml` runs `@visual` on Chromium on every
+push/PR, and its results feed the aggregated Allure report.
+
+It needs the **Linux baselines** committed. Generate/refresh them with the
+**Update visual baselines** workflow (no Docker needed):
+
+1. **Actions → Update visual baselines → Run workflow →** pick your branch.
+2. It regenerates `*-linux.png` on an Ubuntu runner and commits them back to that
+   branch (`chore(visual): update Linux baselines`).
+3. The `visual` job then compares Linux-vs-Linux and passes.
+
+> First-time bootstrap: on a branch that doesn't yet have `*-linux.png`, the `visual`
+> job will fail until you run **Update visual baselines** once to commit them.
+>
+> Prefer local generation? `docker run --rm -v "$PWD":/e2e -w /e2e`
+> `mcr.microsoft.com/playwright:v1.49.1-jammy bash -c "npm ci && npm run visual:update"`
+> then commit the `*-linux.png` files.
 
 ## Layout
 

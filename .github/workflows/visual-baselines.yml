@@ -1,0 +1,50 @@
+name: Update visual baselines
+
+# Regenerates the Linux (`*-linux.png`) baselines for the @visual suite on the
+# same OS that CI runs on, then commits them back to the branch you dispatch from.
+#
+# Run this: Actions → Update visual baselines → Run workflow → pick your branch.
+# Use it to bootstrap CI baselines the first time, and to refresh them whenever an
+# intended design change makes the current baselines stale.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    working-directory: nations-data-e2e
+
+jobs:
+  update-baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: nations-data-e2e/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Install chromium
+        run: npx playwright install --with-deps chromium
+      - name: Regenerate Linux baselines
+        run: npx playwright test --project=chromium --grep @visual --update-snapshots
+        env:
+          BASE_URL: ${{ vars.BASE_URL || 'https://www.thenationsdata.com' }}
+      - name: Commit updated baselines
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/visual/**/*.png
+          if git diff --cached --quiet; then
+            echo "No baseline changes — nothing to commit."
+          else
+            git commit -m "chore(visual): update Linux baselines [skip ci]"
+            git push
+            echo "Committed refreshed Linux baselines to ${{ github.ref_name }}."
+          fi

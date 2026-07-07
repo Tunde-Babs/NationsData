@@ -126,10 +126,40 @@ jobs:
           path: nations-data-e2e/allure-results
           retention-days: 7
 
+  # Visual regression — theme background snapshots (@visual). Chromium only, and
+  # compares against the committed Linux baselines (`*-linux.png`). Bootstrap or
+  # refresh those with the "Update visual baselines" workflow.
+  visual:
+    name: visual (chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: nations-data-e2e/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Install chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run visual regression (@visual)
+        run: npx playwright test --project=chromium --grep @visual
+        env:
+          BASE_URL: ${{ vars.BASE_URL || 'https://www.thenationsdata.com' }}
+      - name: Upload Allure results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-visual
+          path: nations-data-e2e/allure-results
+          retention-days: 7
+
   # Aggregate every job's results into one Allure report with history/trends.
   report:
     name: Allure report
-    needs: [test, cross-browser]
+    needs: [test, cross-browser, visual]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     permissions:
