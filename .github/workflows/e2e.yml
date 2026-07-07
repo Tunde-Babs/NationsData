@@ -27,6 +27,10 @@ on:
           - smoke
           - regression
           - all
+      update_visual_baselines:
+        description: 'Regenerate & commit the Linux @visual baselines (Chromium) to this branch'
+        type: boolean
+        default: false
   schedule:
     - cron: '0 6 * * *' # nightly at 06:00 UTC
 
@@ -127,12 +131,19 @@ jobs:
           retention-days: 7
 
   # Visual regression — theme background snapshots (@visual). Chromium only, and
-  # compares against the committed Linux baselines (`*-linux.png`). Bootstrap or
-  # refresh those with the "Update visual baselines" workflow.
+  # compares against the committed Linux baselines (`*-linux.png`).
+  #
+  # Bootstrap / refresh those baselines: Actions → E2E Tests → Run workflow →
+  # tick "update_visual_baselines" and pick your branch. That regenerates the
+  # Linux PNGs and commits them back to the branch; the next normal run compares
+  # against them and goes green.
   visual:
     name: visual (chromium)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Needed only for the baseline-commit path below.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -145,9 +156,28 @@ jobs:
       - name: Install chromium
         run: npx playwright install --with-deps chromium
       - name: Run visual regression (@visual)
-        run: npx playwright test --project=chromium --grep @visual
+        run: |
+          if [ "${{ github.event.inputs.update_visual_baselines }}" = "true" ]; then
+            echo "Regenerating Linux @visual baselines…"
+            npx playwright test --project=chromium --grep @visual --update-snapshots
+          else
+            npx playwright test --project=chromium --grep @visual
+          fi
         env:
           BASE_URL: ${{ vars.BASE_URL || 'https://www.thenationsdata.com' }}
+      - name: Commit refreshed baselines
+        if: ${{ github.event.inputs.update_visual_baselines == 'true' }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/visual
+          if git diff --cached --quiet; then
+            echo "No baseline changes to commit."
+          else
+            git commit -m "chore(visual): update Linux baselines"
+            git push
+            echo "Committed refreshed Linux baselines to ${{ github.ref_name }}."
+          fi
       - name: Upload Allure results
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4

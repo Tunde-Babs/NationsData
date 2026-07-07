@@ -90,18 +90,20 @@ npm run visual:update    # re-baseline after an *intended* design change, then c
 ### Running visual tests in CI
 
 The `visual` job in `.github/workflows/e2e.yml` runs `@visual` on Chromium on every
-push/PR, and its results feed the aggregated Allure report.
+push/PR, and its results feed the aggregated Allure report. It compares against the
+**Linux baselines** (`*-linux.png`), which must be committed to the branch.
 
-It needs the **Linux baselines** committed. Generate/refresh them with the
-**Update visual baselines** workflow (no Docker needed):
+**Bootstrap / refresh the Linux baselines** (no Docker needed) — this is built into
+the E2E Tests workflow so it works from any branch:
 
-1. **Actions → Update visual baselines → Run workflow →** pick your branch.
-2. It regenerates `*-linux.png` on an Ubuntu runner and commits them back to that
-   branch (`chore(visual): update Linux baselines`).
-3. The `visual` job then compares Linux-vs-Linux and passes.
+1. **Actions → E2E Tests → Run workflow →** select your branch, tick
+   **`update_visual_baselines`**, Run.
+2. The `visual` job regenerates `*-linux.png` on Ubuntu and **commits them back to
+   your branch** (`chore(visual): update Linux baselines`).
+3. That commit triggers a normal run which compares Linux-vs-Linux → **green**.
 
-> First-time bootstrap: on a branch that doesn't yet have `*-linux.png`, the `visual`
-> job will fail until you run **Update visual baselines** once to commit them.
+> First-time bootstrap: on a branch that has no `*-linux.png` yet, the `visual` job
+> fails until you run the workflow once with `update_visual_baselines` ticked.
 >
 > Prefer local generation? `docker run --rm -v "$PWD":/e2e -w /e2e`
 > `mcr.microsoft.com/playwright:v1.49.1-jammy bash -c "npm ci && npm run visual:update"`
