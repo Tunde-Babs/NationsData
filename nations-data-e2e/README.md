@@ -66,6 +66,32 @@ report **with history/trends**:
 branch, enable Pages in **Settings → Pages → Build and deployment → Source:
 Deploy from a branch → `gh-pages` / root**.
 
+## Visual testing (`@visual`)
+
+`tests/visual/hero-theme.spec.ts` guards the **theme background colour**: it
+screenshots `section.hero` in the light and dark themes and compares each against
+a committed baseline (`hero-light.png` / `hero-dark.png`).
+
+```bash
+npm run test:visual      # run the visual check (Chromium)
+npm run visual:update    # re-baseline after an *intended* design change, then commit the PNGs
+```
+
+- **Tolerance** — a 10% pixel budget (`playwright.config.ts → expect.toHaveScreenshot`)
+  means the live hero stats (country/population totals) can change without a false
+  failure, while a real background regression (repaints ~every pixel) still fails.
+- **Chromium-only, one baseline set** — other engines render pixels differently and
+  would each need their own baselines.
+- **Baselines are platform-specific** (font antialiasing differs by OS). The
+  committed baselines are `*-darwin.png`; the suite **skips on CI** until matching
+  Linux baselines exist. To generate them, run the update in the pinned Playwright
+  Linux image and commit the `*-linux.png` files, then drop the `test.skip(CI)`:
+
+  ```bash
+  docker run --rm -v "$PWD":/e2e -w /e2e mcr.microsoft.com/playwright:v1.49.1-jammy \
+    npm ci && npx playwright test --project=chromium --grep @visual --update-snapshots
+  ```
+
 ## Layout
 
 ```

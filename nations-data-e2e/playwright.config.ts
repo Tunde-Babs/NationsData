@@ -14,7 +14,19 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 2,
   workers: process.env.CI ? 4 : undefined,
   timeout: 45_000,
-  expect: { timeout: 12_000 },
+  expect: {
+    timeout: 12_000,
+    // Visual comparisons (@visual). Allow up to 10% of pixels to differ so that
+    // dynamic hero content (live country/population totals) never causes a false
+    // failure — a genuine background-colour regression flips ~every pixel and so
+    // still trips the check. `threshold` absorbs sub-pixel antialiasing per pixel;
+    // `animations: 'disabled'` freezes transitions for a stable capture.
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.1,
+      threshold: 0.2,
+      animations: 'disabled'
+    }
+  },
   reporter: [
     ['list'],
     ['html', { open: 'never' }], // zero-dependency local view

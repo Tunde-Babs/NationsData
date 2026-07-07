@@ -32,4 +32,21 @@ export class HeaderComponent {
       await expect(this.html).toHaveAttribute('data-theme', 'light', { timeout: 1500 });
     }).toPass({ timeout: 15_000 });
   }
+
+  /**
+   * Switch to the dark theme, hydration-safely — the mirror of {@link ensureLight}.
+   * Dark is the app default, so on a fresh page this usually needs no click; retry
+   * until `data-theme="dark"` sticks in case a previous state (or a persisted
+   * preference) left it on light.
+   */
+  async ensureDark(): Promise<void> {
+    await this.page.waitForLoadState('networkidle').catch(() => {});
+    await expect(async () => {
+      const theme = await this.html.getAttribute('data-theme');
+      if (theme !== 'dark') {
+        await this.themeToggle.click({ timeout: 3000 }).catch(() => {});
+      }
+      await expect(this.html).toHaveAttribute('data-theme', 'dark', { timeout: 1500 });
+    }).toPass({ timeout: 15_000 });
+  }
 }
