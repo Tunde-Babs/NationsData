@@ -16,13 +16,12 @@ import { HeaderComponent } from '../../pages/HeaderComponent';
  * test, while a real background-colour regression — which repaints ~every pixel —
  * still fails.
  *
- * Baselines are platform-specific (font antialiasing differs by OS), so they are
- * captured on the machine that runs the test and this suite is skipped on CI until
- * matching Linux baselines are committed (see README → Visual testing).
+ * Baselines are platform-specific (font antialiasing differs by OS), so both are
+ * committed and each environment uses its own: `*-darwin.png` locally, `*-linux.png`
+ * on CI (Ubuntu). Refresh the Linux set with the "Update visual baselines" workflow;
+ * the macOS set with `npm run visual:update` (see README → Visual testing).
  */
 test.describe('VIS · Hero background — theme visual regression @visual', () => {
-  test.skip(!!process.env.CI, 'Commit Linux baselines to enable @visual on CI — see README.');
-
   test.beforeEach(async ({ page }, testInfo) => {
     // One maintained baseline set (Chromium). Other engines render pixels
     // differently and would need their own baselines.

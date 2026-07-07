@@ -80,17 +80,34 @@ npm run visual:update    # re-baseline after an *intended* design change, then c
 - **Tolerance** — a 10% pixel budget (`playwright.config.ts → expect.toHaveScreenshot`)
   means the live hero stats (country/population totals) can change without a false
   failure, while a real background regression (repaints ~every pixel) still fails.
-- **Chromium-only, one baseline set** — other engines render pixels differently and
-  would each need their own baselines.
-- **Baselines are platform-specific** (font antialiasing differs by OS). The
-  committed baselines are `*-darwin.png`; the suite **skips on CI** until matching
-  Linux baselines exist. To generate them, run the update in the pinned Playwright
-  Linux image and commit the `*-linux.png` files, then drop the `test.skip(CI)`:
+- **Chromium-only, one engine's baselines** — other engines render pixels
+  differently and would each need their own set.
+- **Baselines are platform-specific** (font antialiasing differs by OS). Playwright
+  suffixes them per platform, so both sets are committed and each environment uses
+  its own: **`*-darwin.png` locally**, **`*-linux.png` on CI** (Ubuntu). Refresh the
+  macOS set with `npm run visual:update`.
 
-  ```bash
-  docker run --rm -v "$PWD":/e2e -w /e2e mcr.microsoft.com/playwright:v1.49.1-jammy \
-    npm ci && npx playwright test --project=chromium --grep @visual --update-snapshots
-  ```
+### Running visual tests in CI
+
+The `visual` job in `.github/workflows/e2e.yml` runs `@visual` on Chromium on every
+push/PR, and its results feed the aggregated Allure report. It compares against the
+**Linux baselines** (`*-linux.png`), which must be committed to the branch.
+
+**Bootstrap / refresh the Linux baselines** (no Docker needed) — this is built into
+the E2E Tests workflow so it works from any branch:
+
+1. **Actions → E2E Tests → Run workflow →** select your branch, tick
+   **`update_visual_baselines`**, Run.
+2. The `visual` job regenerates `*-linux.png` on Ubuntu and **commits them back to
+   your branch** (`chore(visual): update Linux baselines`).
+3. That commit triggers a normal run which compares Linux-vs-Linux → **green**.
+
+> First-time bootstrap: on a branch that has no `*-linux.png` yet, the `visual` job
+> fails until you run the workflow once with `update_visual_baselines` ticked.
+>
+> Prefer local generation? `docker run --rm -v "$PWD":/e2e -w /e2e`
+> `mcr.microsoft.com/playwright:v1.49.1-jammy bash -c "npm ci && npm run visual:update"`
+> then commit the `*-linux.png` files.
 
 ## Layout
 
