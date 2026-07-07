@@ -11,11 +11,26 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 1,
-  workers: process.env.CI ? 1 : undefined,
+  retries: process.env.CI ? 1 : 2,
+  workers: process.env.CI ? 4 : undefined,
   timeout: 45_000,
   expect: { timeout: 12_000 },
-  reporter: [['html', { open: 'never' }], ['list']],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }], // zero-dependency local view
+    [
+      'allure-playwright',
+      {
+        resultsDir: 'allure-results',
+        detail: true,
+        environmentInfo: {
+          framework: 'Playwright',
+          node: process.version,
+          target: process.env.BASE_URL ?? 'https://www.thenationsdata.com'
+        }
+      }
+    ]
+  ],
   use: {
     baseURL: process.env.BASE_URL ?? 'https://www.thenationsdata.com',
     trace: 'on-first-retry',
