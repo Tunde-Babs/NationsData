@@ -188,3 +188,27 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: nations-data-e2e/allure-report
+
+      # Surface a clickable link to the report on the run's Summary page.
+      - name: Link to Allure report
+        if: ${{ !cancelled() }}
+        run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          PAGES_URL="https://${OWNER_LC}.github.io/${{ github.event.repository.name }}/"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          {
+            echo "## 📊 Allure Report"
+            echo ""
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "This is a PR run, so the report is **not** published to Pages."
+              echo "Download the **\`allure-report\`** artifact from this run instead:"
+              echo ""
+              echo "➡️ **[Open this run's artifacts]($RUN_URL)**"
+            else
+              echo "✅ Published to GitHub Pages:"
+              echo ""
+              echo "### 👉 [$PAGES_URL]($PAGES_URL)"
+              echo ""
+              echo "_(Pages may take ~1 min to rebuild after this run.)_"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
