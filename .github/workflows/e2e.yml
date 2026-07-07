@@ -122,17 +122,16 @@ jobs:
           path: nations-data-e2e/allure-results
           merge-multiple: true
 
-      - name: Fetch previous report (for history/trends)
-        uses: actions/checkout@v4
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages-prev
-
-      - name: Restore history
+      - name: Restore history from gh-pages (if any)
         run: |
-          if [ -d "$GITHUB_WORKSPACE/gh-pages-prev/history" ]; then
-            cp -r "$GITHUB_WORKSPACE/gh-pages-prev/history" allure-results/history
+          if git clone --single-branch --branch gh-pages --depth 1 \
+               "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" \
+               "$GITHUB_WORKSPACE/gh-pages-prev" 2>/dev/null; then
+            [ -d "$GITHUB_WORKSPACE/gh-pages-prev/history" ] \
+              && cp -r "$GITHUB_WORKSPACE/gh-pages-prev/history" allure-results/history || true
+            echo "Restored previous Allure history for trends."
+          else
+            echo "No gh-pages branch yet — starting fresh history."
           fi
 
       - name: Generate Allure report
