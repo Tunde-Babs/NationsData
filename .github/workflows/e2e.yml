@@ -1,15 +1,32 @@
-name: E2E Smoke
+name: E2E Tests
 
-# Smoke suite for NationsData. Runs against production by default; override the
-# target with a repository variable `BASE_URL` (Settings → Variables) to point at
-# a preview/staging deployment. Publishes an Allure report (with history/trends)
-# to GitHub Pages on main/nightly; PRs get the report as a downloadable artifact.
+# Playwright suite for NationsData. Runs against production by default; override
+# the target with a repository variable `BASE_URL` (Settings → Variables) to point
+# at a preview/staging deployment.
+#
+# Manual runs (Actions → E2E Tests → Run workflow) let you pick which suite to run:
+#   - smoke      → @smoke          (fast P0 journeys — the default everywhere)
+#   - regression → @regression     (full P1 + P2 functional suites)
+#   - all        → entire suite    (smoke + regression, no grep filter)
+#
+# Automatic triggers (push to main, PRs, nightly) always run the smoke suite.
+# Publishes an Allure report (with history/trends) to GitHub Pages on main/nightly;
+# PRs get the report as a downloadable artifact.
 
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Which test suite to run'
+        type: choice
+        default: smoke
+        options:
+          - smoke
+          - regression
+          - all
   schedule:
     - cron: '0 6 * * *' # nightly at 06:00 UTC
 
@@ -21,13 +38,18 @@ defaults:
   run:
     working-directory: nations-data-e2e
 
+# Chosen suite for this run. Manual runs use the dropdown; every other trigger
+# (push / PR / nightly) falls back to the fast smoke suite.
+env:
+  SUITE: ${{ github.event.inputs.suite || 'smoke' }}
+
 jobs:
   # Fast gate on every push / PR: desktop (Chromium) + phone (Mobile/WebKit).
   # The mobile project runs on the WebKit engine, so it installs `webkit`.
-  smoke:
-    name: Smoke (${{ matrix.project }})
+  test:
+    name: ${{ github.event.inputs.suite || 'smoke' }} (${{ matrix.project }})
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -45,8 +67,15 @@ jobs:
         run: npm ci
       - name: Install ${{ matrix.browser }}
         run: npx playwright install --with-deps ${{ matrix.browser }}
-      - name: Run smoke tests
-        run: npx playwright test --grep @smoke --project=${{ matrix.project }}
+      - name: Run ${{ env.SUITE }} tests
+        run: |
+          case "$SUITE" in
+            smoke)      FILTER=(--grep @smoke) ;;
+            regression) FILTER=(--grep @regression) ;;
+            all)        FILTER=() ;;
+            *) echo "::error::Unknown suite '$SUITE' (expected smoke|regression|all)"; exit 1 ;;
+          esac
+          npx playwright test "${FILTER[@]}" --project=${{ matrix.project }}
         env:
           BASE_URL: ${{ vars.BASE_URL || 'https://www.thenationsdata.com' }}
       - name: Upload Allure results
@@ -59,10 +88,10 @@ jobs:
 
   # Broader coverage — Firefox + WebKit — nightly and on demand only.
   cross-browser:
-    name: Smoke (${{ matrix.browser }})
+    name: ${{ github.event.inputs.suite || 'smoke' }} (${{ matrix.browser }})
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -78,8 +107,15 @@ jobs:
         run: npm ci
       - name: Install ${{ matrix.browser }}
         run: npx playwright install --with-deps ${{ matrix.browser }}
-      - name: Run smoke tests
-        run: npx playwright test --grep @smoke --project=${{ matrix.browser }}
+      - name: Run ${{ env.SUITE }} tests
+        run: |
+          case "$SUITE" in
+            smoke)      FILTER=(--grep @smoke) ;;
+            regression) FILTER=(--grep @regression) ;;
+            all)        FILTER=() ;;
+            *) echo "::error::Unknown suite '$SUITE' (expected smoke|regression|all)"; exit 1 ;;
+          esac
+          npx playwright test "${FILTER[@]}" --project=${{ matrix.browser }}
         env:
           BASE_URL: ${{ vars.BASE_URL || 'https://www.thenationsdata.com' }}
       - name: Upload Allure results
@@ -93,7 +129,7 @@ jobs:
   # Aggregate every job's results into one Allure report with history/trends.
   report:
     name: Allure report
-    needs: [smoke, cross-browser]
+    needs: [test, cross-browser]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     permissions:
