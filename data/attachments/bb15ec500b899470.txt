@@ -1,0 +1,1 @@
+A snapshot doesn't exist at /home/runner/work/NationsData/NationsData/nations-data-e2e/tests/visual/hero-theme.spec.ts-snapshots/hero-dark-chromium-linux.png, writing actual.
