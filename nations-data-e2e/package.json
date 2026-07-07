@@ -19,6 +19,8 @@
     "smoke:headed": "node scripts/test-and-report.mjs --project=chromium --grep @smoke --headed --workers=1",
     "test:headed": "node scripts/test-and-report.mjs --headed",
     "test:raw": "playwright test",
+    "test:visual": "node scripts/test-and-report.mjs --project=chromium --grep @visual",
+    "visual:update": "playwright test --project=chromium --grep @visual --update-snapshots",
     "report": "playwright show-report",
     "allure:generate": "allure generate allure-results --clean -o allure-report",
     "allure:open": "allure open allure-report",

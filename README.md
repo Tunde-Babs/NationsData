@@ -104,13 +104,26 @@ src/app/
 The heavy datasets (`world-countries`, `country-state-city`) are code-split into
 lazy chunks so the initial bundle stays small; they load on demand.
 
-## Notes / next steps
+## Notes
 
-- **SSR/SEO**: ✅ implemented — see the SSR section above. Remember to add your
-  production domain to `security.allowedHosts` before deploying.
-- **Overpass rate limits**: street data is fetched live and cached. A thin
-  backend proxy with a shared cache (or self-hosted Overpass) would scale better
-  for heavy traffic.
-- **Name coverage**: the streets page shows a "named-road coverage" indicator
-  because OpenStreetMap name completeness varies by region (rich in big cities,
-  sparse in some small towns) and links out to help map an area.
+### Status
+
+- **SSR & SEO** — ✅ shipped. Per-route render modes, client hydration, and the
+  HTTP transfer cache are in place (see the SSR section above).
+- **Named-road coverage** — working as intended, not a gap. The streets page
+  surfaces a "named-road coverage" indicator because OpenStreetMap name
+  completeness varies by region (rich in big cities, sparse in some small towns);
+  the indicator sets expectations and links out to help map an area.
+
+### Roadmap
+
+- **Overpass at scale** — street data is currently fetched live and cached on the
+  client. For heavy traffic, front it with a thin backend proxy holding a shared
+  cache (or self-host Overpass) to smooth rate limits and cut latency.
+
+### Deploy checklist
+
+- **`security.allowedHosts`** — ✅ already lists the production domains
+  (`thenationsdata.com`, `www.thenationsdata.com`) in `angular.json`. When
+  deploying under a **new** hostname (e.g. a staging subdomain), add it here too —
+  it's the SSRF guard for SSR requests.
