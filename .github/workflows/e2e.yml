@@ -233,6 +233,15 @@ jobs:
       - name: Generate Allure report
         run: npm run allure:generate
 
+      # Ship a vercel.json inside the published report so the gh-pages branch itself
+      # tells Vercel not to deploy it. Vercel reads git.deploymentEnabled from the
+      # pushed branch's config — and gh-pages otherwise has none, so Vercel keeps
+      # trying to `ng build` it and fails. This stops that at the source.
+      - name: Opt gh-pages out of Vercel builds
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          printf '{ "git": { "deploymentEnabled": false } }\n' > allure-report/vercel.json
+
       - name: Upload Allure report artifact
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
